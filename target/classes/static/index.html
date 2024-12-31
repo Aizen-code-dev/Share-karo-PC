@@ -1,0 +1,80 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+
+<body class="bg-gray-100">
+    <div class="container mx-auto mt-10 p-4">
+        <div class="text-center mb-6">
+            <h1 class="text-2xl font-bold">File Upload</h1>
+            <p class="text-gray-600">Developed by <a href="https://github.com/Aizen-code-dev">AIzen-code-dev</a></p>
+        </div>
+        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6" role="alert">
+            <p class="font-bold">Notice</p>
+            <p>Maximum file size allowed is 30GB.</p>
+        </div>
+        <form id="uploadForm" class="bg-white p-6 rounded-lg shadow-md">
+            <div class="mb-4">
+                <label for="fileInput" class="block text-gray-700 font-bold mb-2">Choose file</label>
+                <input type="file" id="fileInput" class="w-full px-3 py-2 border rounded-lg" />
+            </div>
+            <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600">Upload</button>
+            <div class="progress-area mt-4 w-full bg-gray-200 rounded-lg">
+                <div class="progress-bar h-2 bg-blue-500 rounded-lg" style="width: 0%;"></div>
+            </div>
+            <div class="uploaded-area mt-4 text-center text-gray-700"></div>
+        </form>
+
+        <div class="text-center mt-6">
+            <p class="text-gray-600">In Mobile browser :</p>
+            <h2 class="text-lg font-semibold">http://192.168.0.184:8080/index.html</h2>
+        <br>
+            <h3>Replace <address><192.168.0.184></address> with your ... ip <address></address></h3>
+  
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const fileInput = document.getElementById('fileInput');
+        const progressBar = document.querySelector('.progress-bar');
+        const uploadedArea = document.querySelector('.uploaded-area');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const file = fileInput.files[0];
+            if (file) {
+                if (file.size > 30 * 1024 * 1024 * 1024) { // 30GB in bytes
+                    uploadedArea.innerHTML = '<div class="text-red-500">File size exceeds the 30GB limit.</div>';
+                    return;
+                }
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/upload', true);
+
+                xhr.upload.addEventListener('progress', (event) => {
+                    const percent = (event.loaded / event.total) * 100;
+                    progressBar.style.width = percent + '%';
+                });
+
+                xhr.onload = () => {
+                    if (xhr.status === 200) {
+                        uploadedArea.innerHTML = '<div class="text-green-500">File uploaded successfully!</div>';
+                    } else {
+                        uploadedArea.innerHTML = '<div class="text-red-500">Upload failed.</div>';
+                    }
+                };
+
+                const formData = new FormData();
+                formData.append('file', file);
+                xhr.send(formData);
+            }
+        });
+    </script>
+</body>
+
+</html>
